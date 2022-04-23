@@ -39,6 +39,7 @@ def compare_tides_class_barplot(tide_df):
                  log_y=True,
                  title=f"High Tide Zone Oragnism Composition Throughout Different Tides <br><sup>High tide total: {high_tide}, Low tide total: {low_tide}</sup>")
     fig.update_layout(title_x=0.5)
+    fig.update_yaxes(title="Individual Count (logscale)")
     fig.write_image(f"plots/tide_class_comparison.png")
 
 
@@ -50,6 +51,7 @@ def compare_times_class_barplot(time_df):
                  log_y=True,
                  title=f"Mid Tide Zone Oragnism Composition Throughout Day vs. Night <br><sup>Night total: {night_total}, Day total: {day_total}</sup>")
     fig.update_layout(title_x=0.5)
+    fig.update_yaxes(title="Individual Count (logscale)")
     fig.write_image(f"plots/time_class_comparison.png")
 
 
