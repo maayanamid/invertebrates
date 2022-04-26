@@ -1,6 +1,8 @@
-
 import pandas as pd
 import plotly.express as px
+from scipy.stats import mannwhitneyu
+
+# TODO - add pval to plots, see "overview_data_rock_complexity" for example
 
 
 def create_fisher_alpha_df(df):
@@ -36,8 +38,8 @@ def compare_tides_class_barplot(tide_df):
     low_tide = int(tide_df[df['Survey'] == 'Low Tide']['Individual Count'].sum())
 
     fig = px.histogram(tide_df, x='Class', y='Individual Count', facet_col="Survey",
-                 log_y=True,
-                 title=f"High Tide Zone Oragnism Composition Throughout Different Tides <br><sup>High tide total: {high_tide}, Low tide total: {low_tide}</sup>")
+                       log_y=True,
+                       title=f"High Tide Zone Oragnism Composition Throughout Different Tides <br><sup>High tide total: {high_tide}, Low tide total: {low_tide}</sup>")
     fig.update_layout(title_x=0.5)
     fig.update_yaxes(title="Individual Count (logscale)")
     fig.write_image(f"plots/tide_class_comparison.png")
@@ -48,13 +50,96 @@ def compare_times_class_barplot(time_df):
     day_total = int(time_df[df['Survey'] == 'Day']['Individual Count'].sum())
 
     fig = px.histogram(time_df, x='Class', y='Individual Count', facet_col="Survey",
-                 log_y=True,
-                 title=f"Mid Tide Zone Oragnism Composition Throughout Day vs. Night <br><sup>Night total: {night_total}, Day total: {day_total}</sup>")
+                       log_y=True,
+                       title=f"Mid Tide Zone Oragnism Composition Throughout Day vs. Night <br><sup>Night total: {night_total}, Day total: {day_total}</sup>")
     fig.update_layout(title_x=0.5)
     fig.update_yaxes(title="Individual Count (logscale)")
     fig.write_image(f"plots/time_class_comparison.png")
 
 
+def metadata_comparison(data_df, survey_name):
+    """
+    Runs a metadata comparison of a specific survey
+    Compares between metadata variables (e.g "Rock Diameter (cm), complexity etc.)
+    :param data_df: dataframe of specific survey
+    :param survey_name: name of the survey
+    """
+    overview_data_rock_size(data_df, survey_name)
+    overview_data_rock_complexity(data_df, survey_name)
+    # TODO - add rock origin (can be done with relabeling of 0,1)
+    # TODO - add bottom type (can be done with relabeling of 0,1)
+
+
+def overview_data_total_individuals(data_df, survey_name):
+    fig = px.box(data_df, x="Survey", y="Individual Count", color="Survey",
+                 title=f"Observations per rock\n{survey_name}")
+    fig.update_layout(title_x=0.5)
+    fig.update_yaxes(title=f"Number of individuals per rock")
+    fig.write_image(f"plots/{survey_name}_total_individuals_comparison.png")
+
+
+def overview_data_individuals_size(data_df, survey_name):
+    """
+    Important notes:
+    1. Valid only for data with organisms
+    2. Species of size >0.1 were defined as species of size 0.001 for the sake of plotting
+    3. Only one data point was added per observation (i.e. if we found 300 individuals of the same species in a single
+    rock we will only use a single data point in this plot)
+    """
+    data_df["Size fixed (cm)"] = data_df["Size of the organism (cm)"].replace(">0.1", 0.001)
+    fig = px.box(data_df, x="Survey", y="Size fixed (cm)", color="Survey",
+                 title=f"Individuals size comparison\n{survey_name}")
+    fig.update_layout(title_x=0.5)
+    fig.update_yaxes(title=f"Individual Size")
+    fig.write_image(f"plots/{survey_name}_individuals size comparison.png")
+
+
+def overview_data_rock_size(data_df, survey_name):
+    fig = px.box(data_df, x="Survey", y="Rock Diameter (cm)", color="Survey",
+                 title=f"Rock size comparison\n{survey_name}")
+    x, y = None, None
+    flag = False
+    for sur in data_df['Survey'].unique():
+        if not flag:
+            x = data_df[data_df["Survey"] == sur]["Rock Diameter (cm)"].to_list()
+        y = data_df[data_df["Survey"] == sur]["Rock Diameter (cm)"].to_list()
+    _, p = mannwhitneyu(x, y)
+    fig.update_layout(title_x=0.5)
+    fig.update_yaxes(title=f"Rock Size (cm)")
+    fig.add_annotation(text=f'Pval = {round(p, 3)}',
+                       align='left',
+                       showarrow=False,
+                       xref='paper',
+                       yref='paper',
+                       x=1.1,
+                       y=0.8,
+                       bordercolor='black',
+                       borderwidth=1)
+    fig.write_image(f"plots/{survey_name}_rock_size_comparison.png")
+
+
+def overview_data_rock_complexity(data_df, survey_name):
+    fig = px.box(data_df, x="Survey", y="Rock Complexity (1-5)", color="Survey",
+                 title=f"Rock complexity comparison\n{survey_name}")
+    x, y = None, None
+    flag = False
+    for sur in data_df['Survey'].unique():
+        if not flag:
+            x = data_df[data_df["Survey"] == sur]["Rock Complexity (1-5)"].to_list()
+        y = data_df[data_df["Survey"] == sur]["Rock Complexity (1-5)"].to_list()
+    _, p = mannwhitneyu(x, y)
+    fig.update_layout(title_x=0.5)
+    fig.update_yaxes(title=f"Rock Complexity (1-lowest complexity, 5-highest complexity)")
+    fig.add_annotation(text=f'Pval = {round(p, 3)}',
+                       align='left',
+                       showarrow=False,
+                       xref='paper',
+                       yref='paper',
+                       x=1.1,
+                       y=0.8,
+                       bordercolor='black',
+                       borderwidth=1)
+    fig.write_image(f"plots/{survey_name}_rock_complexity_comparison.png")
 
 
 if __name__ == '__main__':
@@ -62,17 +147,26 @@ if __name__ == '__main__':
     # clean whitespace
     df = df.applymap(lambda x: x.strip() if isinstance(x, str) else x)
     # clean null
-    df = df[df.Class.notnull()]
+    # NOTE - this data doesn't include observatories without animals
+    # NOTE - data with full information remained and stored in 'df' variable
+    print("Running results section...")
+    species_df = df[df.Class.notnull()]
     # create fisher alpha ds
-    create_fisher_alpha_df(df)
+    create_fisher_alpha_df(species_df)
     # create pie plots by site
-    compare_sites(df)
+    compare_sites(species_df)
     # create comparison dataframes
-    tide_df = df[df['Survey'].isin(['High Tide', 'Low Tide'])]
-    time_df = df[df['Survey'].isin(['Day', 'Night'])]
+    tide_df = species_df[species_df['Survey'].isin(['High Tide', 'Low Tide'])]
+    time_df = species_df[species_df['Survey'].isin(['Day', 'Night'])]
     # create barplots
     compare_tides_class_barplot(tide_df)
     compare_times_class_barplot(time_df)
+
+    overview_data_total_individuals(tide_df, "Tide")
+    overview_data_individuals_size(time_df, "Time")
+
+    metadata_comparison(tide_df, "Tide")
+    metadata_comparison(time_df, "Time")
 
 
 
