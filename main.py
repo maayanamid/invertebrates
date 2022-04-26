@@ -2,7 +2,23 @@ import pandas as pd
 import plotly.express as px
 from scipy.stats import mannwhitneyu
 
-# TODO - add pval to plots, see "overview_data_rock_complexity" for example
+
+def get_pval_by_survey(data_df, col_name):
+    """
+    Runs a mann whitney u test on specific column (by survey) and returns pval
+    :param data_df: dataframe from a specific survey
+    :param col_name:
+    :return:
+    """
+    x, y = None, None
+    flag = True
+    for sur in data_df['Survey'].unique():
+        if flag:
+            x = data_df[data_df["Survey"] == sur][col_name].to_list()
+            flag = False
+        y = data_df[data_df["Survey"] == sur][col_name].to_list()
+    _, p = mannwhitneyu(x, y)
+    return p
 
 
 def create_fisher_alpha_df(df):
@@ -75,7 +91,18 @@ def overview_data_total_individuals(data_df, survey_name):
                  title=f"Observations per rock\n{survey_name}")
     fig.update_layout(title_x=0.5)
     fig.update_yaxes(title=f"Number of individuals per rock")
-    fig.write_image(f"plots/{survey_name}_total_individuals_comparison.png")
+    p = get_pval_by_survey(data_df, "Individual Count")
+    fig.add_annotation(text=f'Pval = {round(p, 3)}',
+                       align='left',
+                       showarrow=False,
+                       xref='paper',
+                       yref='paper',
+                       x=1.1,
+                       y=0.8,
+                       bordercolor='black',
+                       borderwidth=1)
+    # fig.write_image(f"plots/{survey_name}_total_individuals_comparison.png")
+    fig.show()
 
 
 def overview_data_individuals_size(data_df, survey_name):
@@ -91,21 +118,26 @@ def overview_data_individuals_size(data_df, survey_name):
                  title=f"Individuals size comparison\n{survey_name}")
     fig.update_layout(title_x=0.5)
     fig.update_yaxes(title=f"Individual Size")
-    fig.write_image(f"plots/{survey_name}_individuals size comparison.png")
+    p = get_pval_by_survey(data_df, "Size fixed (cm)")
+    fig.add_annotation(text=f'Pval = {round(p, 3)}',
+                       align='left',
+                       showarrow=False,
+                       xref='paper',
+                       yref='paper',
+                       x=1.1,
+                       y=0.8,
+                       bordercolor='black',
+                       borderwidth=1)
+    # fig.write_image(f"plots/{survey_name}_individuals size comparison.png")
+    fig.show()
 
 
 def overview_data_rock_size(data_df, survey_name):
     fig = px.box(data_df, x="Survey", y="Rock Diameter (cm)", color="Survey",
                  title=f"Rock size comparison\n{survey_name}")
-    x, y = None, None
-    flag = False
-    for sur in data_df['Survey'].unique():
-        if not flag:
-            x = data_df[data_df["Survey"] == sur]["Rock Diameter (cm)"].to_list()
-        y = data_df[data_df["Survey"] == sur]["Rock Diameter (cm)"].to_list()
-    _, p = mannwhitneyu(x, y)
     fig.update_layout(title_x=0.5)
     fig.update_yaxes(title=f"Rock Size (cm)")
+    p = get_pval_by_survey(data_df, "Rock Diameter (cm)")
     fig.add_annotation(text=f'Pval = {round(p, 3)}',
                        align='left',
                        showarrow=False,
@@ -115,21 +147,16 @@ def overview_data_rock_size(data_df, survey_name):
                        y=0.8,
                        bordercolor='black',
                        borderwidth=1)
-    fig.write_image(f"plots/{survey_name}_rock_size_comparison.png")
+    # fig.write_image(f"plots/{survey_name}_rock_size_comparison.png")
+    fig.show()
 
 
 def overview_data_rock_complexity(data_df, survey_name):
     fig = px.box(data_df, x="Survey", y="Rock Complexity (1-5)", color="Survey",
                  title=f"Rock complexity comparison\n{survey_name}")
-    x, y = None, None
-    flag = False
-    for sur in data_df['Survey'].unique():
-        if not flag:
-            x = data_df[data_df["Survey"] == sur]["Rock Complexity (1-5)"].to_list()
-        y = data_df[data_df["Survey"] == sur]["Rock Complexity (1-5)"].to_list()
-    _, p = mannwhitneyu(x, y)
     fig.update_layout(title_x=0.5)
     fig.update_yaxes(title=f"Rock Complexity (1-lowest complexity, 5-highest complexity)")
+    p = get_pval_by_survey(data_df, "Rock Complexity (1-5)")
     fig.add_annotation(text=f'Pval = {round(p, 3)}',
                        align='left',
                        showarrow=False,
@@ -139,7 +166,8 @@ def overview_data_rock_complexity(data_df, survey_name):
                        y=0.8,
                        bordercolor='black',
                        borderwidth=1)
-    fig.write_image(f"plots/{survey_name}_rock_complexity_comparison.png")
+    # fig.write_image(f"plots/{survey_name}_rock_complexity_comparison.png")
+    fig.show()
 
 
 if __name__ == '__main__':
@@ -152,19 +180,23 @@ if __name__ == '__main__':
     print("Running results section...")
     species_df = df[df.Class.notnull()]
     # create fisher alpha ds
+
     create_fisher_alpha_df(species_df)
     # create pie plots by site
     compare_sites(species_df)
     # create comparison dataframes
     tide_df = species_df[species_df['Survey'].isin(['High Tide', 'Low Tide'])]
     time_df = species_df[species_df['Survey'].isin(['Day', 'Night'])]
+
     # create barplots
     compare_tides_class_barplot(tide_df)
     compare_times_class_barplot(time_df)
 
+    # overview survey results
     overview_data_total_individuals(tide_df, "Tide")
     overview_data_individuals_size(time_df, "Time")
 
+    # metadata comparison
     metadata_comparison(tide_df, "Tide")
     metadata_comparison(time_df, "Time")
 
