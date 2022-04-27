@@ -97,8 +97,8 @@ def overview_data_total_individuals(data_df, survey_name):
                        showarrow=False,
                        xref='paper',
                        yref='paper',
-                       x=1.1,
-                       y=0.8,
+                       x=1.07,
+                       y=0.9,
                        bordercolor='black',
                        borderwidth=1)
     # fig.write_image(f"plots/{survey_name}_total_individuals_comparison.png")
@@ -124,8 +124,8 @@ def overview_data_individuals_size(data_df, survey_name):
                        showarrow=False,
                        xref='paper',
                        yref='paper',
-                       x=1.1,
-                       y=0.8,
+                       x=1.07,
+                       y=0.9,
                        bordercolor='black',
                        borderwidth=1)
     # fig.write_image(f"plots/{survey_name}_individuals size comparison.png")
@@ -143,8 +143,8 @@ def overview_data_rock_size(data_df, survey_name):
                        showarrow=False,
                        xref='paper',
                        yref='paper',
-                       x=1.1,
-                       y=0.8,
+                       x=1.07,
+                       y=0.9,
                        bordercolor='black',
                        borderwidth=1)
     # fig.write_image(f"plots/{survey_name}_rock_size_comparison.png")
@@ -162,8 +162,8 @@ def overview_data_rock_complexity(data_df, survey_name):
                        showarrow=False,
                        xref='paper',
                        yref='paper',
-                       x=1.1,
-                       y=0.8,
+                       x=1.07,
+                       y=0.9,
                        bordercolor='black',
                        borderwidth=1)
     # fig.write_image(f"plots/{survey_name}_rock_complexity_comparison.png")
@@ -181,16 +181,18 @@ if __name__ == '__main__':
     species_df = df[df.Class.notnull()]
     # create fisher alpha ds
 
-    create_fisher_alpha_df(species_df)
-    # create pie plots by site
-    compare_sites(species_df)
-    # create comparison dataframes
+    # TODO - uncomment lines
+    # create_fisher_alpha_df(species_df)
+    # # create pie plots by site
+    # compare_sites(species_df)
+    # # create comparison dataframes
+
     tide_df = species_df[species_df['Survey'].isin(['High Tide', 'Low Tide'])]
     time_df = species_df[species_df['Survey'].isin(['Day', 'Night'])]
 
-    # create barplots
-    compare_tides_class_barplot(tide_df)
-    compare_times_class_barplot(time_df)
+    # # create barplots
+    # compare_tides_class_barplot(tide_df)
+    # compare_times_class_barplot(time_df)
 
     # overview survey results
     overview_data_total_individuals(tide_df, "Tide")
