@@ -87,8 +87,11 @@ def metadata_comparison(data_df, survey_name):
 
 
 def overview_data_total_individuals(data_df, survey_name):
-    fig = px.box(data_df, x="Survey", y="Individual Count", color="Survey",
+    data_df["Count Fixed"] = data_df['Individual Count'].where(data_df['Individual Count'] <= 50, 50)
+    fig = px.box(data_df, x="Survey", y="Count Fixed", color="Survey",
                  title=f"Observations per rock\n{survey_name}")
+    fig.add_hline(y=50, line_width=1, line_dash="dash", line_color="black", annotation_text="50 individuals or more",
+                  annotation_position="bottom right")
     fig.update_layout(title_x=0.5)
     fig.update_yaxes(title=f"Number of individuals per rock")
     p = get_pval_by_survey(data_df, "Individual Count")
@@ -116,6 +119,9 @@ def overview_data_individuals_size(data_df, survey_name):
     data_df["Size fixed (cm)"] = data_df["Size of the organism (cm)"].replace(">0.1", 0.001)
     fig = px.box(data_df, x="Survey", y="Size fixed (cm)", color="Survey",
                  title=f"Individuals size comparison\n{survey_name}")
+    fig.add_hline(y=0.001, line_width=1, line_dash="dash", line_color="black",
+                  annotation_text="Individuals of size <0.1cm",
+                  annotation_position="bottom right")
     fig.update_layout(title_x=0.5)
     fig.update_yaxes(title=f"Individual Size")
     p = get_pval_by_survey(data_df, "Size fixed (cm)")
@@ -196,11 +202,10 @@ if __name__ == '__main__':
 
     # overview survey results
     overview_data_total_individuals(tide_df, "Tide")
+    overview_data_individuals_size(tide_df, "Tide")
+    overview_data_total_individuals(time_df, "Time")
     overview_data_individuals_size(time_df, "Time")
 
     # metadata comparison
     metadata_comparison(tide_df, "Tide")
     metadata_comparison(time_df, "Time")
-
-
-
