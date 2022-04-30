@@ -128,8 +128,8 @@ def overview_data_individuals_per_rock(data_df, survey_name):
                        showarrow=False,
                        xref='paper',
                        yref='paper',
-                       x=1.07,
-                       y=0.9,
+                       x=1.17,
+                       y=0.8,
                        bordercolor='black',
                        borderwidth=1)
     fig.write_image(f"plots/{survey_name}_total_individuals_comparison.png")
@@ -164,8 +164,8 @@ def overview_data_individuals_size(data_df, survey_name):
                        showarrow=False,
                        xref='paper',
                        yref='paper',
-                       x=1.07,
-                       y=0.9,
+                       x=1.17,
+                       y=0.8,
                        bordercolor='black',
                        borderwidth=1)
     fig.write_image(f"plots/{survey_name}_individuals size comparison.png")
@@ -190,8 +190,8 @@ def overview_data_rock_size(data_df, survey_name):
                        showarrow=False,
                        xref='paper',
                        yref='paper',
-                       x=1.07,
-                       y=0.9,
+                       x=1.17,
+                       y=0.8,
                        bordercolor='black',
                        borderwidth=1)
     fig.write_image(f"plots/{survey_name}_rock_size_comparison.png")
@@ -216,8 +216,8 @@ def overview_data_rock_complexity(data_df, survey_name):
                        showarrow=False,
                        xref='paper',
                        yref='paper',
-                       x=1.07,
-                       y=0.9,
+                       x=1.17,
+                       y=0.8,
                        bordercolor='black',
                        borderwidth=1)
     fig.write_image(f"plots/{survey_name}_rock_complexity_comparison.png")
@@ -247,8 +247,8 @@ def compare_tides_observation_diff_class_barplot(tide_df):
     fig.update_layout(title_x=0.5)
     fig.update_yaxes(title="Observations Count")
     #fig.show()
-    fig.write_image(f"plots/tide_class_comparison.png")
-    fig.write_html(f"interactive_plots/tide_class_comparison.html")
+    fig.write_image(f"plots/tide_organism_distribution.png")
+    fig.write_html(f"interactive_plots/tide_organism_distribution.html")
 
 
 
@@ -273,8 +273,8 @@ def compare_times_observation_diff_class_barplot(tide_df):
     fig.update_layout(title_x=0.5)
     fig.update_yaxes(title="Observations Count")
     #fig.show()
-    fig.write_image(f"plots/tide_class_comparison.png")
-    fig.write_html(f"interactive_plots/tide_class_comparison.html")
+    fig.write_image(f"plots/tide_class_distribution.png")
+    fig.write_html(f"interactive_plots/tide_class_distribution.html")
 
 
 
