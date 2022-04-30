@@ -56,6 +56,8 @@ def create_site_composition_plot(site_df, site_name):
     fig.update_traces(textposition='inside', textinfo='percent+label')
     fig.update_layout(title_x=0.5)
     fig.write_image(f"plots/class_composition_{site_name}.png")
+    fig.write_html(f"interactive_plots/class_composition_{site_name}.html")
+
 
 
 def compare_tides_class_barplot(tide_df):
@@ -72,6 +74,8 @@ def compare_tides_class_barplot(tide_df):
     fig.update_layout(title_x=0.5)
     fig.update_yaxes(title="Individual Count (logscale)")
     fig.write_image(f"plots/tide_class_comparison.png")
+    fig.write_html(f"interactive_plots/tide_class_comparison.html")
+
 
 
 def compare_times_class_barplot(time_df):
@@ -88,6 +92,7 @@ def compare_times_class_barplot(time_df):
     fig.update_layout(title_x=0.5)
     fig.update_yaxes(title="Individual Count (logscale)")
     fig.write_image(f"plots/time_class_comparison.png")
+    fig.write_html(f"interactive_plots/time_class_comparison.html")
 
 
 def metadata_comparison(data_df, survey_name):
@@ -127,8 +132,10 @@ def overview_data_individuals_per_rock(data_df, survey_name):
                        y=0.9,
                        bordercolor='black',
                        borderwidth=1)
-    # fig.write_image(f"plots/{survey_name}_total_individuals_comparison.png")
-    fig.show()
+    fig.write_image(f"plots/{survey_name}_total_individuals_comparison.png")
+    fig.write_html(f"interactive_plots/{survey_name}_total_individuals_comparison.html")
+
+    #fig.show()
 
 
 def overview_data_individuals_size(data_df, survey_name):
@@ -142,6 +149,7 @@ def overview_data_individuals_size(data_df, survey_name):
     :param data_df: survey df
     :param survey_name: Time or Tide
     """
+    data_df = data_df[data_df["Size of the organism (cm)"].notna()]
     data_df["Size fixed (cm)"] = data_df["Size of the organism (cm)"].replace(">0.1", 0.001)
     fig = px.box(data_df, x="Survey", y="Size fixed (cm)", color="Survey",
                  title=f"Individuals size comparison\n{survey_name}")
@@ -160,8 +168,10 @@ def overview_data_individuals_size(data_df, survey_name):
                        y=0.9,
                        bordercolor='black',
                        borderwidth=1)
-    # fig.write_image(f"plots/{survey_name}_individuals size comparison.png")
-    fig.show()
+    fig.write_image(f"plots/{survey_name}_individuals size comparison.png")
+    fig.write_html(f"interactive_plots/{survey_name}_individuals size comparison.html")
+
+    #fig.show()
 
 
 def overview_data_rock_size(data_df, survey_name):
@@ -184,8 +194,10 @@ def overview_data_rock_size(data_df, survey_name):
                        y=0.9,
                        bordercolor='black',
                        borderwidth=1)
-    # fig.write_image(f"plots/{survey_name}_rock_size_comparison.png")
-    fig.show()
+    fig.write_image(f"plots/{survey_name}_rock_size_comparison.png")
+    fig.write_html(f"interactive_plots/{survey_name}_rock_size_comparison.html")
+
+    #fig.show()
 
 
 def overview_data_rock_complexity(data_df, survey_name):
@@ -208,8 +220,10 @@ def overview_data_rock_complexity(data_df, survey_name):
                        y=0.9,
                        bordercolor='black',
                        borderwidth=1)
-    # fig.write_image(f"plots/{survey_name}_rock_complexity_comparison.png")
-    fig.show()
+    fig.write_image(f"plots/{survey_name}_rock_complexity_comparison.png")
+    fig.write_html(f"interactive_plots/{survey_name}_rock_complexity_comparison.html")
+
+    #fig.show()
 
 
 def compare_tides_observation_diff_class_barplot(tide_df):
@@ -232,8 +246,10 @@ def compare_tides_observation_diff_class_barplot(tide_df):
                        title=f"High Tide Zone Organism Composition Distribution")
     fig.update_layout(title_x=0.5)
     fig.update_yaxes(title="Observations Count")
-    fig.show()
-    # fig.write_image(f"plots/tide_class_comparison.png")
+    #fig.show()
+    fig.write_image(f"plots/tide_class_comparison.png")
+    fig.write_html(f"interactive_plots/tide_class_comparison.html")
+
 
 
 def compare_times_observation_diff_class_barplot(tide_df):
@@ -256,8 +272,10 @@ def compare_times_observation_diff_class_barplot(tide_df):
                        title=f"Mid Tide Zone Organism Composition Distribution")
     fig.update_layout(title_x=0.5)
     fig.update_yaxes(title="Observations Count")
-    fig.show()
-    # fig.write_image(f"plots/tide_class_comparison.png")
+    #fig.show()
+    fig.write_image(f"plots/tide_class_comparison.png")
+    fig.write_html(f"interactive_plots/tide_class_comparison.html")
+
 
 
 if __name__ == '__main__':
@@ -291,6 +309,7 @@ if __name__ == '__main__':
 
     compare_tides_observation_diff_class_barplot(tide_df)
     compare_times_observation_diff_class_barplot(time_df)
+
 
     # overview survey results
     overview_data_individuals_per_rock(tide_df_with_zeroes, "Tide")
