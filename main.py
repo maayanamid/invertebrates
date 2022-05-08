@@ -59,7 +59,6 @@ def create_site_composition_plot(site_df, site_name):
     fig.write_html(f"interactive_plots/class_composition_{site_name}.html")
 
 
-
 def compare_tides_class_barplot(tide_df):
     """
     Creates a histogram comparing the number of individuals surveyed in high tide vs low tide
@@ -75,7 +74,6 @@ def compare_tides_class_barplot(tide_df):
     fig.update_yaxes(title="Individual Count (logscale)")
     fig.write_image(f"plots/tide_class_comparison.png")
     fig.write_html(f"interactive_plots/tide_class_comparison.html")
-
 
 
 def compare_times_class_barplot(time_df):
@@ -104,8 +102,6 @@ def metadata_comparison(data_df, survey_name):
     """
     overview_data_rock_size(data_df, survey_name)
     overview_data_rock_complexity(data_df, survey_name)
-    # TODO - add rock origin (can be done with relabeling of 0,1)
-    # TODO - add bottom type (can be done with relabeling of 0,1)
 
 
 def overview_data_individuals_per_rock(data_df, survey_name):
@@ -251,31 +247,29 @@ def compare_tides_observation_diff_class_barplot(tide_df):
     fig.write_html(f"interactive_plots/tide_organism_distribution.html")
 
 
-
-def compare_times_observation_diff_class_barplot(tide_df):
+def compare_times_observation_diff_class_barplot(time_df):
     """
     Counts how many different entries are there for every species.
     In other words, what is the likelihood of finding a specific species under a rock in the survey
     Comparison is between day and night
-    :param tide_df: df of day vs night surveys
+    :param time_df: df of day vs night surveys
     """
-    day_tide_dict = tide_df[df['Survey'] == 'Day'].groupby("Class").count().to_dict()["Individual Count"]
+    day_tide_dict = time_df[df['Survey'] == 'Day'].groupby("Class").count().to_dict()["Individual Count"]
     day_tide_dict = {k: v for k, v in sorted(day_tide_dict.items(), key=lambda item: item[1], reverse=True)}
-    night_tide_dict = tide_df[df['Survey'] == 'Night'].groupby("Class").count().to_dict()["Individual Count"]
-    day_tide_df = pd.DataFrame(day_tide_dict.items(), columns=['Class', 'Count'])
-    day_tide_df['Time'] = 'Day'
-    night_tide_df = pd.DataFrame(night_tide_dict.items(), columns=['Class', 'Count'])
-    night_tide_df['Time'] = 'Night'
-    tides_class_df = pd.concat([day_tide_df, night_tide_df])
+    night_tide_dict = time_df[df['Survey'] == 'Night'].groupby("Class").count().to_dict()["Individual Count"]
+    day_time_df = pd.DataFrame(day_tide_dict.items(), columns=['Class', 'Count'])
+    day_time_df['Time'] = 'Day'
+    night_time_df = pd.DataFrame(night_tide_dict.items(), columns=['Class', 'Count'])
+    night_time_df['Time'] = 'Night'
+    tides_class_df = pd.concat([day_time_df, night_time_df])
 
     fig = px.histogram(tides_class_df, x='Class', y='Count', color='Time', barmode='group',
                        title=f"Mid Tide Zone Organism Composition Distribution")
     fig.update_layout(title_x=0.5)
     fig.update_yaxes(title="Observations Count")
     #fig.show()
-    fig.write_image(f"plots/tide_class_distribution.png")
-    fig.write_html(f"interactive_plots/tide_class_distribution.html")
-
+    fig.write_image(f"plots/time_class_distribution.png")
+    fig.write_html(f"interactive_plots/time_class_distribution.html")
 
 
 if __name__ == '__main__':
@@ -290,9 +284,7 @@ if __name__ == '__main__':
 
     # fill nan values in individual count with 0
     df['Individual Count'] = df['Individual Count'].fillna(0)
-    # create fisher alpha ds
 
-    create_fisher_alpha_df(species_df)
     # create pie plots by site
     compare_sites(species_df)
     # create comparison dataframes
